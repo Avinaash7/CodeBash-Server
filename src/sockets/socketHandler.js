@@ -22,11 +22,13 @@ function socketHandler(io) {
             socket.emit('message', {
                 message: `Welcome to the room ${user.username}`,
                 user: 'Admin',
+                type: 'message',
             });
 
             socket.broadcast.to(user.room).emit('message', {
                 message: `${user.username} has joined the room`,
                 user: 'Admin',
+                type: 'message',
             });
 
             io.to(user.room).emit('roomData', {
@@ -49,6 +51,7 @@ function socketHandler(io) {
                 io.to(user.room).emit('message', {
                     message: `${user.username} has left the room`,
                     user: 'Admin',
+                    type: 'message',
                 });
 
                 io.to(user.room).emit('roomData', {
