@@ -14,7 +14,7 @@ const socketHandler = require('./sockets/socketHandler');
 
 const router = require('./routes/router');
 
-const DB = process.env.DB_URL.replace('<password>', process.env.DB_PASSWORD);
+const DB = process.env.DB_URL.replace('/password/', process.env.DB_PASSWORD);
 
 mongoose
     .connect(DB, {
