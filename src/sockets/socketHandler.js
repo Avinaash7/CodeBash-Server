@@ -25,14 +25,14 @@ const socketHandler = (io) => {
                 message: `Welcome to the room ${user.username}`,
                 user: 'Admin',
                 type: 'message',
-                roomCode: user.roomCode
+                roomCode: user.roomCode,
             });
 
             socket.broadcast.to(user.roomCode).emit('message', {
                 message: `${user.username} has joined the room`,
                 user: 'Admin',
                 type: 'message',
-                roomCode: user.roomCode
+                roomCode: user.roomCode,
             });
 
             io.to(user.roomCode).emit('roomData', {
