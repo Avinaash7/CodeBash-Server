@@ -5,34 +5,39 @@ import {
     getUsersInRoom,
 } from '../utils/utils';
 
-function socketHandler(io) {
+const socketHandler = (io) => {
     io.on('connection', (socket) => {
         console.log('We have a new socket connection');
 
-        socket.on('joinRoom', ({ username, room }, callback) => {
-            const { error, user } = addUserToRoom({ id: socket.id, username, room });
+        socket.on('joinRoom', ({ username, roomCode, roomName }, callback) => {
+            const { error, user } = addUserToRoom({
+                id: socket.id, username, roomCode, roomName,
+            });
 
             if (error) {
                 callback(error);
                 return;
             }
 
-            socket.join(user.room);
+            socket.join(user.roomCode);
 
             socket.emit('message', {
                 message: `Welcome to the room ${user.username}`,
                 user: 'Admin',
                 type: 'message',
+                roomCode: user.roomCode
             });
 
-            socket.broadcast.to(user.room).emit('message', {
+            socket.broadcast.to(user.roomCode).emit('message', {
                 message: `${user.username} has joined the room`,
                 user: 'Admin',
                 type: 'message',
+                roomCode: user.roomCode
             });
 
-            io.to(user.room).emit('roomData', {
-                roomUsers: getUsersInRoom(user.room),
+            io.to(user.roomCode).emit('roomData', {
+                roomUsers: getUsersInRoom(user.roomCode),
+                roomName: user.roomName,
             });
 
             callback();
@@ -41,25 +46,26 @@ function socketHandler(io) {
         socket.on('sendMessage', (message) => {
             const user = getUserById(socket.id);
 
-            io.to(user.room).emit('message', message);
+            io.to(user.roomCode).emit('message', message);
         });
 
         socket.on('disconnect', () => {
             const user = removeUserFromRoom(socket.id);
 
             if (user) {
-                io.to(user.room).emit('message', {
+                io.to(user.roomCode).emit('message', {
                     message: `${user.username} has left the room`,
                     user: 'Admin',
                     type: 'message',
+                    roomCode: user.roomCode,
                 });
 
-                io.to(user.room).emit('roomData', {
-                    roomUsers: getUsersInRoom(user.room),
+                io.to(user.roomCode).emit('roomData', {
+                    roomUsers: getUsersInRoom(user.roomCode),
                 });
             }
         });
     });
-}
+};
 
-export default socketHandler;
+module.exports = socketHandler;

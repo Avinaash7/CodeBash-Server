@@ -1,20 +1,18 @@
 const users = [];
 
-const addUserToRoom = ({ id, username, room }) => {
-    // Cleaning data
-    const cleanedUsername = username.trim().toLowerCase();
-    const cleanedRoom = room.trim().toLowerCase();
-
+const addUserToRoom = ({
+    id, username, roomCode, roomName,
+}) => {
     // validate the data
-    if (!cleanedUsername || !cleanedRoom) {
+    if (!username || !roomCode) {
         return {
-            error: 'A username and a room is required',
+            error: 'A username and a room code is required',
         };
     }
 
     // Check for existing user
     const existingUser = users.find(
-        (user) => user.room === cleanedRoom && user.username === cleanedUsername,
+        (user) => user.roomCode === roomCode && user.username === username,
     );
     if (existingUser) {
         return {
@@ -22,7 +20,15 @@ const addUserToRoom = ({ id, username, room }) => {
         };
     }
 
-    const user = { id, username: cleanedUsername, room: cleanedRoom };
+    let roomNameFinal = roomName;
+
+    if (roomName === null) {
+        roomNameFinal = users.find((user) => user.roomCode === roomCode).roomName;
+    }
+
+    const user = {
+        id, username, roomName: roomNameFinal, roomCode,
+    };
 
     users.push(user);
 
@@ -42,8 +48,8 @@ const removeUserFromRoom = (id) => {
     return null;
 };
 
-const getUsersInRoom = (room) => {
-    const usersInRoom = users.filter((user) => user.room === room);
+const getUsersInRoom = (roomCode) => {
+    const usersInRoom = users.filter((user) => user.roomCode === roomCode);
     return usersInRoom;
 };
 
